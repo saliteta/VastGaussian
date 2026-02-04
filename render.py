@@ -21,9 +21,6 @@ from utils.general_utils import safe_state
 from argparse import ArgumentParser
 from arguments import ModelParams, PipelineParams, get_combined_args
 from gaussian_renderer import GaussianModel
-from utils.manhattan_utils import get_man_trans
-
-
 def render_set(model_path, name, iteration, views, gaussians, pipeline, background):
     render_path = os.path.join(model_path, name, "ours_{}".format(iteration), "renders")
     gts_path = os.path.join(model_path, name, "ours_{}".format(iteration), "gt")
@@ -68,8 +65,8 @@ if __name__ == "__main__":
     args.model_path = os.path.join("./output/", args.exp_name)
     print("Rendering " + args.model_path)
 
-    # Manhatan Alignment
-    args.man_trans = get_man_trans(args)
+    # Manhattan alignment disabled
+    args.man_trans = None
 
     # Initialize system state (RNG)
     safe_state(args.quiet)

@@ -25,7 +25,6 @@ from utils.partition_utils import data_partition, read_camList
 import uuid
 from tqdm import tqdm
 from utils.image_utils import psnr
-from utils.manhattan_utils import get_man_trans
 from argparse import ArgumentParser, Namespace
 from arguments import ModelParams, PipelineParams, OptimizationParams
 import multiprocessing as mp
@@ -105,15 +104,9 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
 
         render_pkg = render(viewpoint_cam, gaussians, pipe, bg)
         image, viewspace_point_tensor, visibility_filter, radii = render_pkg["render"], render_pkg["viewspace_points"], render_pkg["visibility_filter"], render_pkg["radii"]
-        # decouple appearance model
+        # decouple appearance model, this seems what is really useful
         decouple_image, transformation_map = decouple_appearance(image, gaussians, viewpoint_cam.uid)
         gt_image = viewpoint_cam.original_image.cuda()
-
-        # if viewpoint_cam.image_name in test_camList:
-            # # 如果该图片在测试集中，移除该图像的右半边用于test，仅使用左半边图像进行train
-            # gt_image = gt_image[..., :gt_image.shape[-1] // 2]
-            # image = image[..., :image.shape[-1] // 2]
-            # decouple_image = decouple_image[..., :decouple_image.shape[-1] // 2]
 
         # Loss
         # Ll1 = l1_loss(image, gt_image)
@@ -310,8 +303,8 @@ if __name__ == "__main__":
     network_gui.init(args.ip, args.port)
     torch.autograd.set_detect_anomaly(args.detect_anomaly)
 
-    # Manhattan Alignment
-    lp.man_trans = get_man_trans(lp)
+    # Manhattan alignment disabled (man_trans = None: no transform applied)
+    lp.man_trans = None
 
     # train multi gpu
     mp.set_start_method('spawn', force=True)

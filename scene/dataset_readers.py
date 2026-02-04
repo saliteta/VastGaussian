@@ -334,9 +334,17 @@ def readColmapSceneInfoVast(path, model_path, partition_id, images, eval, man_tr
     lines = [line.strip() for line in lines]
 
     cameras_extrinsic_file = os.path.join(path, "sparse/0", "images.bin")
+    if os.path.exists(cameras_extrinsic_file):
+        cam_extrinsics = read_extrinsics_binary_vast(cameras_extrinsic_file, lines)
+    else:
+        cameras_extrinsic_file = os.path.join(path, "sparse/0", "images.txt")
+        cam_extrinsics = read_extrinsics_text(cameras_extrinsic_file)
     cameras_intrinsic_file = os.path.join(path, "sparse/0", "cameras.bin")
-    cam_extrinsics = read_extrinsics_binary_vast(cameras_extrinsic_file, lines)
-    cam_intrinsics = read_intrinsics_binary_vast(cameras_intrinsic_file, lines)
+    if os.path.exists(cameras_intrinsic_file):
+        cam_intrinsics = read_intrinsics_binary_vast(cameras_intrinsic_file, lines)
+    else:
+        cameras_intrinsic_file = os.path.join(path, "sparse/0", "cameras.txt")
+        cam_intrinsics = read_intrinsics_text(cameras_intrinsic_file)
 
     images_dir = os.path.join(path, "images")
     cam_infos_unsorted = readColmapCameras(cam_extrinsics=cam_extrinsics, cam_intrinsics=cam_intrinsics,

@@ -15,6 +15,7 @@ from utils.general_utils import PILtoTorch
 from utils.graphics_utils import fov2focal
 from PIL import Image
 import os
+from typing import List
 
 WARNED = False
 
@@ -161,7 +162,7 @@ def loadCamPartition(args, id, cam_info, image_width, image_height):
         uid=id, width=image_width, height=image_height, data_device=args.data_device)
 
 
-def cameraList_from_camInfos_partition(cam_infos, args):
+def cameraList_from_camInfos_partition(cam_infos, args) -> List[SimpleCamera]:
     camera_list = []
 
     for id, c in enumerate(cam_infos):
