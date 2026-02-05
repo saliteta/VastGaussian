@@ -223,9 +223,11 @@ def read_points3D_binary(path_to_model_file):
             errors[p_id] = error
     return xyzs, rgbs, errors
 
-def read_intrinsics_text(path):
+def read_intrinsics_text(path, lines=None):
     """
     Taken from https://github.com/colmap/colmap/blob/dev/scripts/python/read_write_model.py
+    Signature aligned with read_intrinsics_binary_vast(path, lines); lines is accepted but not
+    used (cameras file has no image names). All cameras are returned.
     """
     cameras = {}
     with open(path, "r") as fid:
@@ -311,9 +313,10 @@ def read_intrinsics_binary(path_to_model_file):
     return cameras
 
 
-def read_extrinsics_text(path):
+def read_extrinsics_text(path, lines=None):
     """
     Taken from https://github.com/colmap/colmap/blob/dev/scripts/python/read_write_model.py
+    If lines is not None, only images whose name is in lines are returned (for filtering, same as read_extrinsics_binary_vast).
     """
     images = {}
     with open(path, "r") as fid:
@@ -329,6 +332,9 @@ def read_extrinsics_text(path):
                 tvec = np.array(tuple(map(float, elems[5:8])))
                 camera_id = int(elems[8])
                 image_name = elems[9]
+                if lines is not None and image_name not in lines:
+                    fid.readline()  # skip the 2D points line
+                    continue
                 elems = fid.readline().split()
                 xys = np.column_stack([tuple(map(float, elems[0::3])),
                                        tuple(map(float, elems[1::3]))])
